@@ -1,0 +1,42 @@
+trigger:
+  - main
+
+variables:
+  message: "Hello DevOps Pipeline"
+
+stages:
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+      - job: BuildJob
+        displayName: Simple Build Job
+        pool:
+          vmImage: 'ubuntu-latest'
+
+        steps:
+          # ✅ Checkout (safe even if repo empty)
+          - checkout: self
+
+          # ✅ Simple script (always succeeds)
+          - script: |
+              echo "Build Stage Running..."
+              echo $(message)
+              echo "Build Completed Successfully"
+            displayName: Run Build Script
+
+  - stage: Deploy
+    displayName: Deploy Stage
+    dependsOn: Build
+    condition: succeeded()
+
+    jobs:
+      - job: DeployJob
+        displayName: Simple Deploy Job
+        pool:
+          vmImage: 'ubuntu-latest'
+
+        steps:
+          - script: |
+              echo "Deploy Stage Running..."
+              echo "Deployment Successful"
+            displayName: Run Deploy Script
